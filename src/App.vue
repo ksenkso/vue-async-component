@@ -5,44 +5,13 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
+import waitForComponents from "@/waitForComponents";
 
 const HelloWorld = () => ({
-  component: import(/* webpackChunkName: "hello-world" */'./components/HelloWorld.vue')
-      .then(c => c),
+  component: import(/* webpackChunkName: "hello-world" */'./components/HelloWorld.vue'),
 });
-
-function checkAsyncComponents(components) {
-  const loaders = [];
-  Object.entries(components).forEach(([name, component]) => {
-    if (typeof component === 'function' && component.prototype instanceof Vue) {
-      console.log(name, 'sync');
-    } else {
-      let resolve;
-      const promise = new Promise(r => {
-        resolve = r;
-      });
-      Object.defineProperty(component, 'resolved', {
-        set(loadedComponent) {
-          this._resolved = loadedComponent;
-          if (loadedComponent.options.components) {
-            checkAsyncComponents(loadedComponent.options.components)
-              .then(resolve)
-          } else {
-            resolve();
-          }
-        },
-        get() {
-          return this._resolved;
-        }
-      });
-      loaders.push(promise);
-    }
-  })
-  return Promise.all(loaders);
-}
-
 
 @Component({
   components: {
@@ -51,9 +20,10 @@ function checkAsyncComponents(components) {
 })
 export default class App extends Vue {
   mounted() {
-    checkAsyncComponents(this.$options.components)
+    waitForComponents(this.$options.components)
       .then(() => {
         console.log('all components have loaded');
+        console.dir(this.$options.components);
       })
   }
 }

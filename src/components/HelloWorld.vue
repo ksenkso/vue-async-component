@@ -1,7 +1,7 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <AsyncComponent></AsyncComponent>
+    <Async></Async>
     <p>
       For a guide and recipes on how to configure / customize this project,<br>
       check out the
@@ -39,18 +39,16 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import {Component, Prop} from 'vue-property-decorator';
+import {mixins} from "vue-class-component";
+import AsyncComponent from '@/mixins/AsyncComponent.ts';
 
-const AsyncComponent = () => import('@/components/AsyncComponent.vue');
+const Async = () => import('@/components/Async.vue');
 @Component({
-  components: { AsyncComponent }
+  components: { Async }
 })
-export default class HelloWorld extends Vue {
+export default class HelloWorld extends mixins<AsyncComponent>(AsyncComponent) {
   @Prop() private msg!: string;
-
-  mounted() {
-    console.log('hello')
-  }
 }
 </script>
 

@@ -1,30 +1,35 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+    <img @click="log" alt="Vue logo" src="./assets/logo.png">
+    <HelloWorld ref="hello" msg="Welcome to Your Vue.js + TypeScript App"/>
   </div>
 </template>
 
 <script lang="ts">
-import {Component, Vue} from 'vue-property-decorator';
-import waitForComponents from "@/waitForComponents";
+import {Component, Ref, Vue} from 'vue-property-decorator';
+import {mixins} from "vue-class-component";
+import WaitForComponents from "@/mixins/WaitForComponents";
 
-const HelloWorld = () => ({
-  component: import(/* webpackChunkName: "hello-world" */'./components/HelloWorld.vue'),
-});
+const HelloWorld = () => import(/* webpackChunkName: "hello-world" */'./components/HelloWorld.vue');
 
 @Component({
   components: {
     HelloWorld,
   },
 })
-export default class App extends Vue {
+export default class App extends mixins<any>(WaitForComponents) {
+
+  @Ref('hello') hello!: Vue;
+
   mounted() {
-    waitForComponents(this.$options.components)
+    this.waitForComponents()
       .then(() => {
-        console.log('all components have loaded');
-        console.dir(this.$options.components);
+        console.log(this.hello.$refs.async);
       })
+  }
+
+  log() {
+    console.log(this.hello);
   }
 }
 </script>
